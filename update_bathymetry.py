@@ -37,7 +37,7 @@ def run():
             good=vals[np.isfinite(vals)]
             if len(good)<vals.size*.45:raise ValueError('Troppi dati batimetrici mancanti')
             if not (-7000<float(np.nanmin(good))<0 and -7000<float(np.nanmax(good))<500):
-                raise ValueError('Valori altimetrici non plausibili per area marina')
+                raise ValueError(f'Valori altimetrici non plausibili per area marina: minimo={float(np.nanmin(good)):.2f}, massimo={float(np.nanmax(good)):.2f}, pixel_validi={len(good)}/{vals.size}, CRS={ds.crs}, bounds={ds.bounds}, nodata={ds.nodata}')
             depth=[[None if not np.isfinite(v) or v>0 else round(float(v),1) for v in row] for row in vals]
     obj={'source':'EMODnet Bathymetry DTM WCS emodnet:mean',
          'wcs_url':url,'retrieved':datetime.now(timezone.utc).isoformat(),
