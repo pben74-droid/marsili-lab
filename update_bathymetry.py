@@ -36,13 +36,23 @@ def run():
             lat=[float(rasterio.transform.xy(ds.transform,r,0,offset='center')[1]) for r in range(ds.height-1,-1,-1)]
             good=vals[np.isfinite(vals)]
             if len(good)<vals.size*.45:raise ValueError('Troppi dati batimetrici mancanti')
-            if not (-7000<float(np.nanmin(good))<0 and -7000<float(np.nanmax(good))<500):
-                raise ValueError(f'Valori altimetrici non plausibili per area marina: minimo={float(np.nanmin(good)):.2f}, massimo={float(np.nanmax(good)):.2f}, pixel_validi={len(good)}/{vals.size}, CRS={ds.crs}, bounds={ds.bounds}, nodata={ds.nodata}')
+            # The bounding box includes land. Positive elevations are valid source data,
+            # but are masked in the underwater-only visualization below.
+            minimum, maximum = float(np.min(good)), float(np.max(good))
+            sea_count = int(np.count_nonzero(good <= 0))
+            if not (-7000 < minimum < 0 and 0 <= maximum < 4000 and sea_count >= vals.size * .45):
+                raise ValueError(
+                    f'Quote o copertura marina non plausibili: minimo={minimum:.2f}, '
+                    f'massimo={maximum:.2f}, celle_marine={sea_count}/{vals.size}, '
+                    f'pixel_validi={len(good)}/{vals.size}, CRS={ds.crs}, bounds={ds.bounds}, nodata={ds.nodata}'
+                )
+            print(f'Validazione EMODnet: minimo={minimum:.2f} m, massimo={maximum:.2f} m, '
+                  f'celle_marine={sea_count}/{vals.size}. Le celle di terra sono escluse dal modello 3D.')
             depth=[[None if not np.isfinite(v) or v>0 else round(float(v),1) for v in row] for row in vals]
     obj={'source':'EMODnet Bathymetry DTM WCS emodnet:mean',
          'wcs_url':url,'retrieved':datetime.now(timezone.utc).isoformat(),
          'bbox':list(BBOX),'resolution_deg':RES,'lon':lon,'lat':lat,'depth_m':depth,
-         'note':'Quote in metri rispetto al livello del mare; negativo sotto il mare. Celle prive di dato null. Griglia ricampionata, non risoluzione nativa.'}
+         'note':'Quote in metri rispetto al livello del mare; negativo sotto il mare. Celle di terra (quote positive) e celle prive di dato sono null. Griglia ricampionata, non risoluzione nativa.'}
     target=ROOT/'docs/bathymetry.json'
     target.write_text(json.dumps(obj,ensure_ascii=False,separators=(',',':')))
     print('Pubblicata griglia EMODnet',len(lat),'x',len(lon),'->',target)
