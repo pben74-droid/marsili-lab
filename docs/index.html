@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="it">
 <head>
@@ -44,7 +43,9 @@ a{color:#72cde8}
 .leaflet-container{font-family:inherit}
 .leaflet-popup-content{color:#152536}
 .sources a{margin-right:15px}
-footer{padding:12px 24px;color:var(--muted)}
+footer{padding:12px 24px;color:var(--muted);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.visit-counter{display:inline-flex;align-items:center;gap:9px}
+.visit-counter img{display:block;height:24px;max-width:100%}
 @media(max-width:950px){
   .layout{grid-template-columns:1fr}
   .wide{grid-column:auto}
@@ -187,7 +188,12 @@ footer{padding:12px 24px;color:var(--muted)}
 
 </main>
 
-<footer>Marsili Lab Web v3.0 · Aggiornamento programmato GitHub Actions · Nessun account richiesto</footer>
+<footer>
+  <span>Marsili Lab Web v3.0 · Aggiornamento programmato GitHub Actions · Nessun account richiesto</span>
+  <span class="visit-counter" aria-label="Contatore delle visualizzazioni del sito">
+    <img src="https://hits.sh/pben74-droid.github.io/marsili-lab/index.html.svg?style=flat-square&amp;label=Visite&amp;color=46d8ce&amp;labelColor=203952" alt="Numero di visualizzazioni del sito" referrerpolicy="no-referrer">
+  </span>
+</footer>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
